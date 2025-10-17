@@ -1,3 +1,9 @@
+# Interactive Car Sales Voice Trainer
+
+## 🚀 [Click Here to Start the Live Simulator](https://your-username.github.io/your-repository-name/car_sales_trainer.html) 🚀
+
+Welcome to the interactive sales training simulator...
+
 Interactive Car Sales Voice Trainer
 ​Welcome to the interactive sales training simulator for the Lithia Dodge sales team. This tool is designed to help you master the appointment-setting phone script by practicing in a realistic, voice-activated environment before you get on a live call.
 ​The goal is to build muscle memory so you can handle any customer objection confidently and effectively guide the conversation toward a set appointment.
