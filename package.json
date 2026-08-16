@@ -1,0 +1,20 @@
+{
+  "name": "northline-site-system",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Production system for high-end lead-generating websites for the Alaska market.",
+  "type": "module",
+  "scripts": {
+    "dev": "pnpm --filter @northline/flagship dev",
+    "build": "pnpm -r build",
+    "preview": "pnpm --filter @northline/flagship preview",
+    "verify": "node scripts/verify.mjs",
+    "typecheck": "pnpm -r typecheck"
+  },
+  "devDependencies": {
+    "playwright": "^1.62.1",
+    "typescript": "^5.7.2",
+    "vite": "^6.0.7"
+  },
+  "packageManager": "pnpm@10.33.0"
+}

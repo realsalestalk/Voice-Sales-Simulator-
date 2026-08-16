@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="en" data-tier="1">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Northline — Websites for Alaska Businesses</title>
+    <meta
+      name="description"
+      content="Northline builds fast, high-end websites for Alaska businesses in Anchorage, Fairbanks, and the Mat-Su Valley — engineered to rank in local search and turn visitors into phone calls."
+    />
+    <link rel="canonical" href="https://northline.example/" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Northline — Websites for Alaska Businesses" />
+    <meta
+      property="og:description"
+      content="High-end websites for Alaska businesses, engineered to rank locally and convert."
+    />
+
+    <!--
+      The hero headline and CTA are inline static HTML, and the poster is a pure
+      CSS gradient. Nothing above the fold waits on JavaScript, so LCP is
+      independent of the WebGL bundle on every tier.
+    -->
+    <link rel="stylesheet" href="./src/styles/main.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+
+    <div class="stage-layer" aria-hidden="true">
+      <div class="stage-poster" id="stage-poster"></div>
+      <canvas class="stage-canvas" id="stage-canvas"></canvas>
+    </div>
+
+    <header class="site-header">
+      <a class="wordmark" href="/">
+        NORTH<span>LINE</span>
+      </a>
+      <nav class="site-nav" aria-label="Primary">
+        <a href="#work">Work</a>
+        <a href="#approach">Approach</a>
+        <a href="#contact" class="nav-cta">Start a project</a>
+      </nav>
+    </header>
+
+    <main id="main">
+      <section class="hero" id="hero">
+        <p class="eyebrow">Anchorage, Alaska</p>
+        <h1 class="hero-title">
+          Most Alaska businesses<br />
+          lose the search before<br />
+          the customer ever calls.
+        </h1>
+        <p class="hero-sub">
+          We build the site that wins it — fast enough to rank, sharp enough to
+          remember, and built to put the phone in your hand.
+        </p>
+        <div class="hero-actions">
+          <a class="btn btn-primary" href="#contact">Start a project</a>
+          <a class="btn btn-ghost" href="#work">See the work</a>
+        </div>
+        <div class="scroll-hint" aria-hidden="true">
+          <span>SCROLL</span>
+          <i></i>
+        </div>
+      </section>
+
+      <section class="section" id="work">
+        <div class="section-head">
+          <p class="eyebrow">01 — What we build</p>
+          <h2>Sites that carry their own weight.</h2>
+        </div>
+        <ul class="card-grid">
+          <li class="card">
+            <h3>Local search that lands</h3>
+            <p>
+              Structured data, city and service pages written individually, and a
+              technical base that holds up in the Map Pack — where Alaska
+              customers actually start.
+            </p>
+          </li>
+          <li class="card">
+            <h3>Speed on rural bandwidth</h3>
+            <p>
+              Built for a phone on a weak signal outside Palmer, not a fiber
+              connection in a design studio. The heavy visuals never block the
+              page from loading.
+            </p>
+          </li>
+          <li class="card">
+            <h3>Design that outclasses the market</h3>
+            <p>
+              Real-time graphics and motion work most regional competitors cannot
+              match — used where it earns attention, and dropped where it would
+              cost you a customer.
+            </p>
+          </li>
+        </ul>
+      </section>
+
+      <section class="section section-quiet" id="approach">
+        <div class="section-head">
+          <p class="eyebrow">02 — How it works</p>
+          <h2>Three tiers, one site.</h2>
+          <p class="section-lead">
+            Every site ships in three rendering modes and picks one per visitor.
+            A gaming desktop gets the full aurora. A mid-range laptop gets a
+            lighter version. A phone on a metered connection gets a fast static
+            page that still looks deliberate — because that visitor is the one
+            most likely to call.
+          </p>
+        </div>
+        <ol class="tier-list">
+          <li>
+            <span class="tier-num">Tier 3</span>
+            <span class="tier-body">
+              <strong>Full experience.</strong> Real-time aurora, five-octave
+              noise, pointer parallax, post-processing.
+            </span>
+          </li>
+          <li>
+            <span class="tier-num">Tier 2</span>
+            <span class="tier-body">
+              <strong>Standard.</strong> Same shader, reduced detail, capped
+              pixel ratio, no post FX.
+            </span>
+          </li>
+          <li>
+            <span class="tier-num">Tier 1</span>
+            <span class="tier-body">
+              <strong>Static.</strong> No WebGL downloaded at all. Designed
+              gradient, full content, fastest possible load.
+            </span>
+          </li>
+        </ol>
+        <p class="tier-note">
+          You are currently viewing
+          <strong id="tier-readout">Tier 1 — static</strong>.
+        </p>
+      </section>
+
+      <section class="section" id="contact">
+        <div class="section-head">
+          <p class="eyebrow">03 — Start</p>
+          <h2>Tell us what you're building.</h2>
+        </div>
+        <form class="lead-form" id="lead-form" novalidate>
+          <div class="field">
+            <label for="name">Name</label>
+            <input id="name" name="name" type="text" autocomplete="name" required />
+          </div>
+          <div class="field">
+            <label for="business">Business</label>
+            <input id="business" name="business" type="text" autocomplete="organization" />
+          </div>
+          <div class="field">
+            <label for="email">Email</label>
+            <input id="email" name="email" type="email" autocomplete="email" required />
+          </div>
+          <div class="field">
+            <label for="phone">Phone</label>
+            <input id="phone" name="phone" type="tel" autocomplete="tel" />
+          </div>
+          <div class="field field-wide">
+            <label for="detail">What do you need?</label>
+            <textarea id="detail" name="detail" rows="4"></textarea>
+          </div>
+          <!-- Honeypot: hidden from users, catches naive form spam. -->
+          <div class="field-honey" aria-hidden="true">
+            <label for="company-url">Company URL</label>
+            <input id="company-url" name="company_url" type="text" tabindex="-1" autocomplete="off" />
+          </div>
+          <button class="btn btn-primary" type="submit">Send</button>
+          <p class="form-status" id="form-status" role="status" aria-live="polite"></p>
+        </form>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <p>Northline — Anchorage, Alaska</p>
+      <p>
+        <a href="tel:+19075550142">(907) 555-0142</a>
+      </p>
+    </footer>
+
+    <!-- Mobile click-to-call. The single highest-converting element on a local
+         service site, and the reason Tier 1 is a first-class design target. -->
+    <div class="call-bar">
+      <a class="btn btn-primary" href="tel:+19075550142" data-analytics="call">
+        Call (907) 555-0142
+      </a>
+    </div>
+
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "ProfessionalService",
+        "name": "Northline",
+        "description": "Web design and development studio serving Alaska businesses.",
+        "url": "https://northline.example/",
+        "telephone": "+1-907-555-0142",
+        "address": {
+          "@type": "PostalAddress",
+          "addressLocality": "Anchorage",
+          "addressRegion": "AK",
+          "addressCountry": "US"
+        },
+        "areaServed": [
+          { "@type": "City", "name": "Anchorage" },
+          { "@type": "City", "name": "Fairbanks" },
+          { "@type": "City", "name": "Juneau" },
+          { "@type": "City", "name": "Wasilla" },
+          { "@type": "City", "name": "Palmer" }
+        ]
+      }
+    </script>
+
+    <script type="module" src="./src/main.ts"></script>
+  </body>
+</html>

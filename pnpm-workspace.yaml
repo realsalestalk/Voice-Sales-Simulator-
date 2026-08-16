@@ -1,0 +1,7 @@
+packages:
+  - 'packages/*'
+  - 'sites/*'
+
+# Vite needs esbuild's postinstall to place its native binary.
+onlyBuiltDependencies:
+  - esbuild

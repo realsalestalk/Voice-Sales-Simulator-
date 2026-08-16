@@ -1,0 +1,20 @@
+{
+  "name": "@northline/flagship",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview --port 4173",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@northline/engine": "workspace:*"
+  },
+  "devDependencies": {
+    "rollup-plugin-visualizer": "^5.12.0",
+    "typescript": "^5.7.2",
+    "vite": "^6.0.7"
+  }
+}
