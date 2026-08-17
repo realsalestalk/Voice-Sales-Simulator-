@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(pnpm typecheck)",
+      "Bash(pnpm -r typecheck)",
+      "Bash(pnpm test)",
+      "Bash(node scripts/verify.mjs)",
+      "mcp__Google_Drive__search_files",
+      "mcp__Google_Drive__read_file_content",
+      "mcp__Google_Drive__download_file_content",
+      "mcp__github__pull_request_read"
+    ]
+  }
+}
