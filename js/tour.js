@@ -577,6 +577,9 @@ export class Tour {
         const er = el.getBoundingClientRect(), cr = sc.getBoundingClientRect();
         if (sc.scrollHeight > sc.clientHeight + 2 && (er.top < cr.top + 12 || er.bottom > cr.bottom - 12)) sc.scrollTo({ top: sc.scrollTop + (er.top - cr.top) - cr.height * 0.3, behavior: App.reducedMotion() ? 'instant' : 'smooth' });
         if (sc.scrollWidth > sc.clientWidth + 2 && (er.left < cr.left || er.left > cr.right - 60)) sc.scrollTo({ left: sc.scrollLeft + (er.left - cr.left) - 12, behavior: 'instant' });
+        // let the inner scroll settle before measuring (bounded)
+        let last = -1, still = 0; const t0 = performance.now();
+        while (performance.now() - t0 < 900 && still < 3) { await raf(); if (Math.abs(sc.scrollTop - last) < 0.5) still++; else still = 0; last = sc.scrollTop; }
       }
       await frames(1);
       let m = this.measure(el);
