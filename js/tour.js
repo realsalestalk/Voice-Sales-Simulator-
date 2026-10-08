@@ -631,6 +631,21 @@ export class Tour {
       await frames(2);
       if (!live()) throw CANCELLED;
       if (!el.isConnected) { const again = document.querySelector(step.target); if (again) { this.target = again; this.lastT = null; } }
+      // if what the tap opened now covers the control, explain the opened panel instead
+      if (step.after) {
+        await this.clock.wait(App.reducedMotion() ? 30 : 420, live);
+        const m0 = this.measure(this.target);
+        const top = document.elementFromPoint(m0.T.x, m0.T.y);
+        const nt = document.querySelector(step.after);
+        if (nt && (!top || !this.target.contains(top))) {
+          this.target = nt; this.lastT = null;
+          const m1 = this.measure(nt);
+          const sol2 = this.solve(m1.T, m1.pr, []);
+          if (sol2) await this.walkTo(sol2, live);
+          const m3 = this.measure(nt); this.T = m3.T; this.lastT = { ...m3.T };
+          await this.aimAndTap(m3.T, sol2 || this.solve(m3.T, m3.pr), live, 1);
+        }
+      }
       this.needCheck = true; this.lastMoveAt = performance.now();
     }
 

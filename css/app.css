@@ -90,7 +90,7 @@ h1:focus, h1:focus-visible, main:focus { outline: none; }
 
 /* ---------- top bar ---------- */
 .topbar {
-  position: sticky; top: 0; z-index: 40; height: var(--top-h);
+  position: sticky; top: env(safe-area-inset-top, 0px); z-index: 40; height: var(--top-h);
   display: flex; align-items: center; gap: 12px; padding: 0 16px;
   background: color-mix(in srgb, var(--bg) 78%, transparent);
   backdrop-filter: saturate(180%) blur(20px); -webkit-backdrop-filter: saturate(180%) blur(20px);

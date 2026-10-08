@@ -22,15 +22,15 @@ export const STEPS = [
   // 2 · My team
   { ch: 1, route: 'team', target: T('node-feed'), clip: 'sam-walk-you-through', prep: a => a.team.clear(),
     text: "I'll walk you through it. This map shows who may talk to whom. At the top, the shared market feed sends the same timestamped observations to every squad." },
-  { ch: 1, route: 'team', target: T('node-alex'), prep: a => a.team.clear(), act: a => a.team.select('alex'),
+  { ch: 1, route: 'team', target: T('node-alex'), prep: a => a.team.clear(), act: a => a.team.select('alex'), after: '#drawer h2',
     text: "Each researcher serves exactly two bots. Alex writes notes only for Ben and Maya. Tapping him highlights his connections and opens his card." },
   { ch: 1, route: 'team', target: T('drawer-restrictions'), prep: a => a.team.select('alex'),
     text: "His card lists his role, inputs, outputs and permitted tools — and his restrictions. He can't read other squads' notebooks, and he can't size trades." },
   { ch: 1, route: 'team', target: T('map-blocked'), prep: a => a.team.clear(), expr: 'warn',
     text: "These red marks are the walls between squads. Research opinions never cross them, so one squad's mistake can't quietly become everyone's." },
-  { ch: 1, route: 'team', target: T('node-ava'), prep: a => a.team.clear(), act: a => a.team.select('ava'),
+  { ch: 1, route: 'team', target: T('node-ava'), prep: a => a.team.clear(), act: a => a.team.select('ava'), after: '#drawer h2',
     text: "Ava is our independent evidence reviewer. She reviews one squad at a time. Agreement doesn't convince her, and disagreement alone doesn't sink a sound proposal." },
-  { ch: 1, route: 'team', target: T('node-sam'), prep: a => a.team.clear(), act: a => a.team.select('sam'), expr: 'happy',
+  { ch: 1, route: 'team', target: T('node-sam'), prep: a => a.team.clear(), act: a => a.team.select('sam'), after: '#drawer h2', expr: 'happy',
     text: "And that's me, the head coach. I read Ava's verdict and the risk checks, apply the combined limits, and write the decision record. I can't override missing evidence." },
 
   // 3 · Watchlist

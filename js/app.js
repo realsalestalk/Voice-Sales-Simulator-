@@ -78,13 +78,13 @@ const decoSams = [];
 
 function renderNav() {
   const nav = $('#nav');
-  nav.innerHTML = ROUTES.map(r => `<a href="#/${r.id}" data-route="${r.id}" data-tour="nav-${r.id}"><span class="ni" style="background:${r.color}">${r.icon}</span>${esc(r.label)}</a>`).join('') +
+  nav.innerHTML = ROUTES.map(r => `<a href="#${r.id}" data-route="${r.id}" data-tour="nav-${r.id}"><span class="ni" style="background:${r.color}">${r.icon}</span>${esc(r.label)}</a>`).join('') +
     `<div class="nav-foot"><b>Demonstration.</b> ${esc(DEMO_NOTE)}.</div>`;
 }
 
 export async function go(route, { fromTour = false } = {}) {
   if (!ROUTES.some(r => r.id === route)) route = 'overview';
-  if (location.hash !== `#/${route}`) history.replaceState(null, '', `#/${route}`);
+  if (location.hash !== `#${route}`) { try { history.replaceState(null, '', `#${route}`); } catch { /* sandboxed */ } }
   if (route === currentRoute) return;
   const main = $('#view');
   closeDrawer();
@@ -122,7 +122,7 @@ const VIEWS = {
         <p class="lead" data-tour="hero-lead">Survival League is a crypto research and paper-trading laboratory. Five researchers, ten strategy bots, an independent evidence reviewer and a head coach turn shared market observations into written, checkable decisions — on simulated prices with paper money only.</p>
         <div class="row" style="margin-top:20px">
           <button class="btn primary" data-action="start-tour" data-tour="start-tour">▶ Start the guided tour</button>
-          <a class="btn" href="#/team">Meet the team</a>
+          <a class="btn" href="#team">Meet the team</a>
         </div>
       </div>
       <div class="hero-art" aria-hidden="true">
@@ -415,7 +415,7 @@ function renderStages() {
     res.risk.status === 'skipped' ? '<p class="small muted">Skipped — the proposal was stopped at evidence review. Limits are never a substitute for evidence.</p>' :
       `<div data-tour="risk-checks">${res.risk.checks.map(c => `<div class="check"><span class="ic ${c.status === 'ok' ? 'ok' : c.status === 'blocked' ? 'bad' : 'warn'}">${c.status === 'ok' ? '✓' : c.status === 'blocked' ? '✕' : '↓'}</span><div style="flex:1;min-width:0"><b>${esc(c.label)}</b> <span class="tiny muted">${esc(c.scope)} · ${esc(c.limit)}</span><div class="tiny muted">${esc(c.detail)}</div>${c.cap ? `<div class="meter" style="margin-top:4px"><span style="width:${c.used / c.cap * 100}%"></span><span class="add" style="left:${c.used / c.cap * 100}%;width:${c.add / c.cap * 100}%"></span></div>` : ''}</div></div>`).join('')}</div>`,
     `<span class="chip ${decTone}" data-tour="sam-decision">${esc(res.coach.decision)}</span><p class="small" style="margin-top:6px">${esc(res.coach.rationale)}</p>`,
-    `<p class="small">Saved as <b class="mono">${esc(res.record.id)}</b> in Activity — proposal, evidence, checks, decision and rationale.</p><a class="btn sm" href="#/activity" style="margin-top:8px" data-tour="open-activity">Open Activity ›</a>`,
+    `<p class="small">Saved as <b class="mono">${esc(res.record.id)}</b> in Activity — proposal, evidence, checks, decision and rationale.</p><a class="btn sm" href="#activity" style="margin-top:8px" data-tour="open-activity">Open Activity ›</a>`,
   ];
   const tones = ['', '', '', avaTone, riskTone, decTone, 'ok'];
   host.innerHTML = STAGES.map((s, i) => `<div class="stage ${i < k ? 'on ' + tones[i] : ''}" data-tour="stage-${i + 1}"><div class="dot">${i + 1}</div><div class="body"><h4>${esc(s)}</h4>${i < k ? `<div style="margin-top:6px">${body[i]}</div>` : '<p class="tiny muted">waiting…</p>'}</div></div>`).join('');
@@ -578,9 +578,9 @@ export function hideDecoSams(hide) { if (hide) { destroyDecoSams(); $$('[data-de
 // ---------- boot ----------
 export function init() {
   renderNav();
-  const r = (location.hash.match(/^#\/(\w+)/) || [])[1] || 'overview';
+  const r = (location.hash.match(/^#\/?(\w+)/) || [])[1] || 'overview';
   go(r, { fromTour: true });
-  window.addEventListener('hashchange', () => { const r2 = (location.hash.match(/^#\/(\w+)/) || [])[1]; if (r2 && r2 !== currentRoute) go(r2); });
+  window.addEventListener('hashchange', () => { const r2 = (location.hash.match(/^#\/?(\w+)/) || [])[1]; if (r2 && r2 !== currentRoute && ROUTES.some(x => x.id === r2)) go(r2); });
   window.addEventListener('resize', () => { fitWatchGrid(); fitGrowthGrid(); });
   document.addEventListener('keydown', e => { if (e.key === 'Escape' && $('#drawer')?.classList.contains('open') && !document.body.classList.contains('sheet-open')) team.clear(); });
 }
