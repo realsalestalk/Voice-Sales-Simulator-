@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Survival League</title>
+<meta name="description" content="A simulated crypto research and paper-trading laboratory. Demonstration only: simulated prices, paper accounts, no live agents or orders.">
+<meta name="theme-color" content="#f5f5f7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0b0b0e" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%235b78d6'/%3E%3Ctext x='16' y='22' font-family='Arial' font-size='16' font-weight='700' fill='white' text-anchor='middle'%3ESL%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+<a class="sr-only" href="#view">Skip to content</a>
+<header class="topbar">
+  <a class="brand" href="#overview" aria-label="Survival League home"><span class="brand-mark" aria-hidden="true">SL</span><span class="brand-name">Survival League</span></a>
+  <span class="demo-pill" title="Simulated prices · paper accounts · example alerts · no live agents, scans or orders">Simulation<span class="long">&nbsp;· paper only</span></span>
+  <span class="spacer"></span>
+  <button class="btn sm primary" data-action="start-tour" aria-label="Start the guided tour with Sam">▶ <span class="long-l">Tour</span></button>
+</header>
+<div class="shell">
+  <nav class="nav" id="nav" aria-label="Sections"></nav>
+  <main id="view" tabindex="-1"></main>
+</div>
+<aside class="drawer" id="drawer" aria-hidden="true" aria-label="Agent details"></aside>
+<noscript><p style="padding:24px">Survival League needs JavaScript to run its in-browser simulation.</p></noscript>
+<script type="module" src="js/main.js"></script>
+</body>
+</html>

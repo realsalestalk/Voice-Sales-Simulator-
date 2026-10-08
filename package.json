@@ -1,0 +1,12 @@
+{
+  "name": "survival-league",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Survival League — a simulated crypto research and paper-trading laboratory (demonstration only).",
+  "scripts": {
+    "serve": "npx http-server -p 8080 -c-1 .",
+    "test": "node --test tests/engine.test.js",
+    "e2e": "node tests/e2e.mjs"
+  }
+}
