@@ -426,7 +426,8 @@ export class Tour {
           const y = T.y - R * Math.sin(th) - g.shoulder.y * s;
           const oob = Math.max(0, b.minX - x) + Math.max(0, x - b.maxX) + Math.max(0, b.minY - y) + Math.max(0, y - b.maxY);
           const body = { left: x + W * 0.1, right: x + W * 0.9, top: y + H * 0.04, bottom: y + H * 0.98 };
-          let ov = protect ? overlapArea(body, protect) / (W * H) : 0;
+          let ov = 0;
+          for (const [rect, wgt] of (Array.isArray(protect) ? protect : [[protect, 1]])) if (rect) ov += overlapArea(body, rect) / Math.max(1, Math.min(W * H, rect.width * rect.height)) * wgt;
           for (const a of avoid) ov += overlapArea(body, a) / (W * H) * 0.6;
           const dist = Math.hypot(x - this.pos.x, y - this.pos.y);
           const score = oob * 40 + ov * 900 + Math.abs(d - prefDeg) * 0.5 + (ext - 1) * 160 + dist * 0.02 + (side !== this.side ? 4 : 0);
@@ -597,7 +598,7 @@ export class Tour {
           const toY = clamp(window.scrollY + (r.top - want), 0, Math.max(0, maxS));
           delta = toY - window.scrollY;
           if (Math.abs(delta) > 1) {
-            const vr2 = { ...m.pr, top: m.pr.top - delta, bottom: m.pr.bottom - delta };
+            const vr2 = [[{ ...m.vr, top: m.vr.top - delta, bottom: m.vr.bottom - delta }, 1.6], [{ ...m.pr, top: m.pr.top - delta, bottom: m.pr.bottom - delta }, 0.5]];
             const T2 = { x: m.T.x, y: m.T.y - delta };
             const sol = this.solve(T2, vr2, this.avoidRects(el), delta);
             const sDur = clamp(Math.abs(delta) * 0.55, 320, 950);
@@ -612,7 +613,7 @@ export class Tour {
       // settle: re-measure after scrolling (scroll may clamp) and correct with a short walk
       m = this.measure(el);
       this.T = m.T; this.lastT = { ...m.T };
-      const sol = this.solve(m.T, m.pr, this.avoidRects(el));
+      const sol = this.solve(m.T, [[m.vr, 1.6], [m.pr, 0.5]], this.avoidRects(el));
       if (sol) await this.walkTo(sol, live);
       this.updateRing();
       return sol;
@@ -625,7 +626,7 @@ export class Tour {
     this.phase = 'tapping';
     const m2 = this.measure(el); this.T = m2.T; this.lastT = { ...m2.T };
     this.ring.classList.add('on'); this.updateRing();
-    await this.aimAndTap(m2.T, sol || this.solve(m2.T, m2.pr), live, 3);
+    await this.aimAndTap(m2.T, sol || this.solve(m2.T, [[m2.vr, 1.6], [m2.pr, 0.5]]), live, 3);
     if (!live()) throw CANCELLED;
 
     // 5. what the tap does
@@ -643,10 +644,10 @@ export class Tour {
         if (nt && (!top || !this.target.contains(top))) {
           this.target = nt; this.lastT = null;
           const m1 = this.measure(nt);
-          const sol2 = this.solve(m1.T, m1.pr, []);
+          const sol2 = this.solve(m1.T, [[m1.vr, 1.6], [m1.pr, 0.5]], []);
           if (sol2) await this.walkTo(sol2, live);
           const m3 = this.measure(nt); this.T = m3.T; this.lastT = { ...m3.T };
-          await this.aimAndTap(m3.T, sol2 || this.solve(m3.T, m3.pr), live, 1);
+          await this.aimAndTap(m3.T, sol2 || this.solve(m3.T, [[m3.vr, 1.6], [m3.pr, 0.5]]), live, 1);
         }
       }
       this.needCheck = true; this.lastMoveAt = performance.now();
@@ -738,7 +739,7 @@ export class Tour {
         this.needCheck = false; this.awayFromTarget = true;
         return;
       }
-      const sol = this.solve(m.T, m.pr, this.avoidRects(this.target));
+      const sol = this.solve(m.T, [[m.vr, 1.6], [m.pr, 0.5]], this.avoidRects(this.target));
       const inB = this.pos.x >= b.minX - 1 && this.pos.x <= b.maxX + 1 && this.pos.y >= b.minY - 1 && this.pos.y <= b.maxY + 1;
       const tipErr = this.tipError(m.T);
       if (!this.awayFromTarget && inB && tipErr < 6) return;
