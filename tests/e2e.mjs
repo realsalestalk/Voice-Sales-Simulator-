@@ -203,26 +203,53 @@ async function specialRuns(browser) {
 }
 
 async function audioRun() {
-  // autoplay allowed: approved recording actually plays and drives the mouth
-  console.log('\n▶ recorded-voice');
+  // Autoplay allowed: Sam's voice actually plays, starts while he walks, and keeps going.
+  console.log('\n▶ narration');
   const b = await chromium.launch({ args: ['--autoplay-policy=no-user-gesture-required'] });
   const ctx = await b.newContext({ viewport: { width: 1280, height: 800 } });
   const page = await ctx.newPage();
+  const errors = []; page.on('pageerror', e => errors.push(e.message));
   await page.addInitScript(() => { try { localStorage.clear(); localStorage.setItem('sl:autoNext', 'false'); } catch {} });
-  await page.goto(BASE + '#/overview');
+  await page.goto(BASE + '#overview');
   await page.click('.topbar [data-action="start-tour"]');
-  await waitPhase(page, 0, ['narrating']).catch(() => {});
-  await page.waitForTimeout(900);
-  const info = await page.evaluate(() => { const n = window.__tour.narr; return { kind: n.active?.kind, t: n.active?.a?.currentTime, mouth: n.mouth, ok: n.audioOk }; });
-  info.kind === 'clip' && info.t > 0.2 ? pass('recorded-voice', `approved clip playing (t=${info.t.toFixed(2)}s)`) : fail('recorded-voice', `clip not playing ${JSON.stringify(info)}`);
+  await page.waitForFunction(() => { const n = window.__tour?.narr; return n?.active?.kind === 'audio' && n.active.a.currentTime > 0.3; }, null, { timeout: 15000 })
+    .then(async () => { const src = await page.evaluate(() => window.__tour.narr.el.src); /sam-take-your-time/.test(src) ? pass('narration', 'step 1 opens with the approved recording') : fail('narration', `step 1 first audio was ${src}`); })
+    .catch(() => fail('narration', 'no audio playing at tour start'));
+  // For a sample of steps: speech starts within 1.2 s (while he is still walking), and he talks most of the step.
+  for (const i of [4, 11, 17, 22, 29, 30, 34, 36]) {
+    await page.evaluate(n => window.__tour.goTo(n), i);
+    const t0 = Date.now(); let firstSpeech = null, talking = 0, samples = 0, phasesWhileTalking = new Set();
+    while (Date.now() - t0 < 60000) {
+      const st = await page.evaluate(() => { const t = window.__tour, n = t.narr; return { phase: t.phase, idx: t.idx, audio: n.active?.kind === 'audio' && !n.active.a.paused, any: !!n.active }; });
+      if (st.idx !== i) break;
+      samples++; if (st.audio) { talking++; phasesWhileTalking.add(st.phase); if (firstSpeech === null) firstSpeech = Date.now() - t0; }
+      if (st.phase === 'idle') break;
+      await page.waitForTimeout(100);
+    }
+    const ratio = talking / Math.max(1, samples);
+    const ok = firstSpeech !== null && firstSpeech < 1200 && ratio > 0.75 && phasesWhileTalking.has('moving') && phasesWhileTalking.has('tapping') && phasesWhileTalking.has('narrating');
+    (ok ? pass : fail)('narration', `step ${i + 1}: speech starts ${firstSpeech}ms, talking ${(ratio * 100).toFixed(0)}% of the step, during ${[...phasesWhileTalking].join('/')}`);
+    console.log(`  step ${i + 1}: first speech ${firstSpeech}ms · talking ${(ratio * 100).toFixed(0)}% · phases ${[...phasesWhileTalking].join(',')}`);
+  }
+  // pause freezes the voice
+  await page.evaluate(() => window.__tour.goTo(12));
+  await page.waitForFunction(() => window.__tour.narr.active?.kind === 'audio', null, { timeout: 10000 }).catch(() => {});
+  await page.click('.dock [data-k="play"]');
+  const a1 = await page.evaluate(() => window.__tour.narr.el.currentTime); await page.waitForTimeout(800);
+  const a2 = await page.evaluate(() => ({ t: window.__tour.narr.el.currentTime, paused: window.__tour.narr.el.paused }));
+  a2.paused && Math.abs(a2.t - a1) < 0.05 ? pass('narration', 'pause stops the voice') : fail('narration', `voice kept playing while paused ${JSON.stringify({ a1, a2 })}`);
+  await page.click('.dock [data-k="play"]'); await page.waitForTimeout(600);
+  const a3 = await page.evaluate(() => window.__tour.narr.el.currentTime);
+  a3 > a2.t ? pass('narration', 'resume continues the voice') : fail('narration', 'voice did not resume');
+  errors.length ? fail('narration', errors.join(' | ')) : pass('narration', 'no page errors');
   await b.close();
 }
 
 const browser = await chromium.launch();
-for (const vp of VIEWPORTS) await runViewport(browser, vp);
+if (ONLY !== 'narration') for (const vp of VIEWPORTS) await runViewport(browser, vp);
 if (!ONLY) await specialRuns(browser);
 await browser.close();
-if (!ONLY) await audioRun();
+if (!ONLY || ONLY === 'narration') await audioRun();
 const bad = results.filter(r => !r.ok);
 fs.writeFileSync(`${OUT}/summary.json`, JSON.stringify(results, null, 1));
 console.log(`\n${results.length - bad.length} passed, ${bad.length} failed`);

@@ -88,7 +88,6 @@ export class Tour {
       onStatus: s => this.status(s.message, s.retry),
     });
     this.narr.soundOn = App.store.get('soundOn', true);
-    this.narr.deviceVoice = App.store.get('deviceVoice', false);
     this.buildDom();
   }
 
@@ -249,8 +248,7 @@ export class Tour {
       <h4>Chapters</h4>
       <div class="chap-list">${CHAPTERS.map((c, i) => `<button data-jump="${c.first}" class="${cur.ch === i ? 'cur' : ''}"><span class="mono tiny">${String(i + 1).padStart(2, '0')}</span><span>${c.title}</span><span class="tiny muted" style="margin-left:auto">${c.count}</span></button>`).join('')}</div>
       <h4>Sound & playback</h4>
-      ${sw('sound', this.narr.soundOn, 'Sound', this.narr.audioOk ? 'Plays Sam\'s approved recordings where a line matches.' : 'Unavailable in this browser right now — captions continue.')}
-      ${sw('device', this.narr.deviceVoice, 'Device voice for other lines', this.narr.deviceVoiceAvailable ? 'Your device\'s built-in voice. <b>Not Sam\'s voice</b> — his voice cannot be recreated here.' : 'Not supported in this browser.', !this.narr.deviceVoiceAvailable)}
+      ${sw('sound', this.narr.soundOn, 'Sound', this.narr.audioOk ? 'Sam talks through every step. Four lines are his approved recordings; the rest use a generated voice chosen to sound like him. Turn off for captions only.' : 'Unavailable in this browser right now. Captions continue.')}
       ${sw('auto', this.autoNext, 'Auto-next', 'Continue to the next step after Sam finishes.')}
       <div class="row" style="margin-top:12px">
         <button class="btn sm" data-m="repeat">↺ Repeat step</button>
@@ -266,7 +264,6 @@ export class Tour {
       if (s) {
         const on = s.getAttribute('aria-checked') !== 'true'; s.setAttribute('aria-checked', on);
         if (s.dataset.sw === 'sound') { this.narr.soundOn = on; App.store.set('soundOn', on); if (!on) this.narr.stop(); }
-        if (s.dataset.sw === 'device') { this.narr.deviceVoice = on; App.store.set('deviceVoice', on); }
         if (s.dataset.sw === 'auto') { this.autoNext = on; App.store.set('autoNext', on); }
         return;
       }
@@ -552,8 +549,11 @@ export class Tour {
     const live = () => tok === this.run && this.active;
     const step = STEPS[this.idx];
     this.phase = 'moving'; this.ring.classList.remove('on');
-    this.plan = this.narr.prepare(step);           // prepare narration during movement
-    try { this.sam?.setSpeaking(false); this.sam?.setExpression('neutral'); } catch { /* ignore */ }
+    this.plan = this.narr.prepare(step);
+    this.narr.preload(STEPS[this.idx + 1]);
+    try { this.sam?.setExpression('talk'); } catch { /* ignore */ }
+    // Sam starts talking right away: the "go" line covers the walk to the control.
+    const goSpeech = this.talk(this.plan.go, live).catch(e => e);
 
     // 1. page transition (stick lowered while traveling)
     if (App.route() !== step.route) {
@@ -570,7 +570,11 @@ export class Tour {
     const el = await this.findTarget(step, live);
     this.status('');
     this.target = el;
-    if (!el) { this.status('This control is not visible right now — continuing with narration.'); this.phase = 'narrating'; await this.narrate(step, live); return this.afterNarration(live); }
+    if (!el) {
+      this.status('This control is not visible right now — continuing with narration.');
+      if (await goSpeech === CANCELLED) throw CANCELLED;
+      this.phase = 'narrating'; await this.talk([...this.plan.tap, ...this.plan.say], live); return this.afterNarration(live);
+    }
 
     // 3. coordinated scroll + walk
     const moving = (async () => {
@@ -620,14 +624,18 @@ export class Tour {
     })();
     const sol = await Promise.race([moving, this.clock.wait(9000, live).then(() => null)]);
     if (!live()) throw CANCELLED;
-    await this.clock.wait(App.reducedMotion() ? 40 : 160, live); // settle before teaching
+    this.ring.classList.add('on'); this.updateRing();
+    // finish the "go" line before tapping (he keeps talking while he settles)
+    if (await goSpeech === CANCELLED) throw CANCELLED;
+    await this.clock.wait(App.reducedMotion() ? 40 : 120, live);
 
-    // 4. tap three times at the center of the real target
+    // 4. tap three times at the center of the real target, saying what he's pressing
     this.phase = 'tapping';
     const m2 = this.measure(el); this.T = m2.T; this.lastT = { ...m2.T };
-    this.ring.classList.add('on'); this.updateRing();
+    this.updateRing();
+    const tapSpeech = this.talk(this.plan.tap, live).catch(e => e);
     await this.aimAndTap(m2.T, sol || this.solve(m2.T, [[m2.vr, 1.6], [m2.pr, 0.5]]), live, 3);
-    if (!live()) throw CANCELLED;
+    if (await tapSpeech === CANCELLED || !live()) throw CANCELLED;
 
     // 5. what the tap does
     if (step.act) {
@@ -653,18 +661,18 @@ export class Tour {
       this.needCheck = true; this.lastMoveAt = performance.now();
     }
 
-    // 6. narrate (prepared during the walk)
+    // 6. explain what happened and why it matters
     this.phase = 'narrating';
-    await this.narrate(step, live);
+    await this.talk(this.plan.say, live);
     return this.afterNarration(live);
   }
 
-  async narrate(step, live) {
-    try { this.sam?.setExpression(step.expr === 'happy' ? 'happy' : 'talk'); this.sam?.setSpeaking(true); } catch { /* ignore */ }
-    try { await this.narr.speak(this.plan, () => !live()); }
+  async talk(parts, live) {
+    if (!parts?.length) return;
+    try { this.sam?.setSpeaking(true); } catch { /* ignore */ }
+    try { await this.narr.speak(parts, () => !live()); }
     finally { try { this.sam?.setSpeaking(false); this.sam?.setMouth(0); } catch { /* ignore */ } }
     if (!live()) throw CANCELLED;
-    try { this.sam?.setExpression(step.expr && step.expr !== 'talk' ? step.expr : 'happy'); } catch { /* ignore */ }
   }
 
   async afterNarration(live) {
@@ -672,7 +680,7 @@ export class Tour {
     this.setWord(STEPS[this.idx].text.split(/\s+/).length - 1);
     if (this.idx === STEPS.length - 1) { try { this.sam?.setExpression('happy'); } catch { /* ignore */ } return; }
     if (this.autoNext) {
-      await this.clock.wait(1100, live);
+      await this.clock.wait(650, live);
       if (live() && !this.menuOpen) this.goTo(this.idx + 1);
     }
   }

@@ -328,8 +328,9 @@ const VIEWS = {
         </div>
         <div class="stack">
           <div class="card" data-tour="voice-note"><h3>About Sam's voice</h3>
-            <p class="small" style="margin-top:6px">Sam speaks with <b>your approved recordings</b> where a line matches: “Take your time. I'll walk you through it.”, “Choose an example, then press Next step.” and “See what comes in, what happens, and what comes out.”</p>
-            <p class="small muted" style="margin-top:6px">This site cannot recreate his voice for new sentences — no voice-cloning service is connected. Every other step is shown as live captions with matching mouth movement. You may opt in to your device's built-in voice in the tour options; it is clearly labelled and is <b>not</b> Sam's voice.</p></div>
+            <p class="small" style="margin-top:6px">Sam talks through the entire tour: what he's heading to while he walks, what he's pressing while he taps, and what just happened and why it matters.</p>
+            <p class="small" style="margin-top:6px">Four lines are <b>your approved recordings</b>: “Take your time. I'll walk you through it.”, “I'll walk you through it.”, “Choose an example, then press Next step.” and “See what comes in, what happens, and what comes out.”</p>
+            <p class="small muted" style="margin-top:6px">Every other line uses a <b>generated voice</b> (open-source Kokoro model), chosen because it measured closest to those recordings in pitch and tone. It is not a clone of Sam's voice. Turn Sound off in the tour options for captions only.</p></div>
           <div class="card chapters"><h3>Chapters</h3><ol id="chap-ol" class="small" style="margin-top:8px"></ol></div>
         </div>
       </div>`;

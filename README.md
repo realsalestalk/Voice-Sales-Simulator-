@@ -52,11 +52,16 @@ changes and folding. A frosted dock offers Back, Pause/Resume, Next/Finish and p
 transcript, sound, device voice, auto-next, repeat and take-over live in the options menu (opening it
 pauses; closing it restores your previous pause state).
 
-**Voice:** Sam's approved recordings (cut from the reference videos) play where a line matches —
-“Take your time. I'll walk you through it.”, “I'll walk you through it.”, “Choose an example, then
-press Next step.” and “See what comes in, what happens, and what comes out.” No voice-cloning
-service is connected, so other lines are shown as timed captions with mouth movement. An opt-in
-“device voice” is available and is labelled as **not** Sam's voice.
+**Voice:** Sam talks through the entire walkthrough. Each step has three spoken parts that run
+alongside his movement: what he is heading to (while he walks), what he is pressing (while he taps),
+and what happened and why it matters (after the result appears). Four lines are his approved
+recordings, cut from the reference videos: “Take your time. I'll walk you through it.”, “I'll walk
+you through it.”, “Choose an example, then press Next step.” and “See what comes in, what happens,
+and what comes out.” Every other line (114 lines, about 10½ minutes) is pre-generated with the
+open-source Kokoro-82M model (Apache-2.0) using a blend of stock voices chosen because it measured
+closest to those recordings in timbre and pitch (`tools/samvoice.py`, `tools/build_voice.py`). It is
+**not** a clone of Sam's voice, and the page says so. If sound is off or fails, the same lines run as
+timed captions with matching mouth movement.
 
 ## Run and test
 
@@ -70,5 +75,6 @@ npm run e2e              # Playwright: all 38 steps on 6 viewports + controls (s
 
 - Simulated data only; one seeded price path. Paper outcomes are not forecasts or advice.
 - Sam's expressions and head turns come from the reference frames; there is no free head rig.
+- The generated narration voice resembles Sam's recordings but is not his voice.
 - Samsung Fold7 sizes are tested with approximate CSS viewports in Chromium; physical-device testing
   is still required.

@@ -110,7 +110,7 @@ export function createSam({ size = 150, reducedMotion = false } = {}) {
   function drawFace(f) {
     if (!f.face) return;
     // eyelids (blink)
-    if (st.blink > 0.02) {
+    if (st.blink > 0.02 && f.face.eyeL) {
       for (const [k, rx, ry] of [['eyeL', 9.5, 7.6], ['eyeR', 6.2, 7.8]]) {
         const [ex, ey] = f.face[k];
         ctx.save();

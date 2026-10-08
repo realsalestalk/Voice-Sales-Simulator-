@@ -54,6 +54,18 @@ for i in SETS['walk']:
 frames = []
 REF_FACE = dict(mouth=(850, 385), eyeL=(775, 335), eyeR=(872, 325))
 face_tpl = cv2.cvtColor(load(180)[260:460, 700:960], cv2.COLOR_RGB2GRAY).astype(np.float32)
+# mouth references located by hand in the source footage (frame -> mouth x, y)
+MOUTH_REFS = {1: (926, 404), 61: (1068, 420), 124: (831, 415), 180: (850, 385), 228: (762, 371)}
+_mtpl = {}
+def track_mouth(i):
+    r = min(MOUTH_REFS, key=lambda k: abs(k - i)); mx, my = MOUTH_REFS[r]
+    if r not in _mtpl:
+        _mtpl[r] = cv2.cvtColor(load(r)[my - 110:my + 40, mx - 90:mx + 90], cv2.COLOR_RGB2GRAY).astype(np.float32)
+    g = cv2.cvtColor(load(i), cv2.COLOR_RGB2GRAY).astype(np.float32)
+    y0, x0 = max(0, my - 110 - 120), max(0, mx - 90 - 160)
+    win = g[y0:my + 40 + 120, x0:mx + 90 + 160]
+    res = cv2.matchTemplate(win, _mtpl[r], cv2.TM_CCOEFF_NORMED); _, conf, _, loc = cv2.minMaxLoc(res)
+    return (loc[0] + x0 + 90, loc[1] + y0 + 110), conf
 
 for set_, ids in SETS.items():
     for i in ids:
@@ -148,6 +160,9 @@ for set_, ids in SETS.items():
             r = cv2.matchTemplate(g, face_tpl, cv2.TM_CCOEFF_NORMED); _, _, _, mx = cv2.minMaxLoc(r)
             dx, dy = mx[0] + 640 - 700, mx[1] + 200 - 260
             fr['face'] = {k: [float((v[0] + dx - ax) * sc), float((v[1] + dy - ay) * sc)] for k, v in REF_FACE.items()}
+        if 'face' not in fr:
+            (mx, my), conf = track_mouth(i)
+            if conf > 0.45: fr['face'] = {'mouth': [float((mx - ax) * sc), float((my - ay) * sc)]}
         frames.append(fr)
         print(set_, i, fr['w'], fr['h'], round(fr['ox']), round(fr['oy']), 'grip' in fr and [round(v) for v in fr['grip']], file=sys.stderr)
 
