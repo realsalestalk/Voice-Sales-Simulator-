@@ -106,10 +106,12 @@ export class Narrator {
     try { await a.play(); } catch { this.audioOk = false; this.onStatus?.({ message: 'The browser blocked sound. Tap Retry sound, or keep going with captions.', retry: true }); return false; }
     this.active = { kind: 'audio', a };
     const wt = d.wordTimes || [];
+    let lastKick = performance.now();
     try {
       await new Promise((resolve, reject) => {
         const tick = () => {
-          if (!live()) { a.pause(); reject(CANCELLED); return; }
+          if (!live()) { reject(CANCELLED); return; }   // stop() owns pausing the shared element
+          if (a.paused && !a.ended && !this.clock.paused && performance.now() - lastKick > 400) { lastKick = performance.now(); a.play().catch(() => {}); }
           const t = a.currentTime;
           const env = d.env[Math.floor(t * d.fps)] ?? 0;
           this.setMouth(a.paused ? 0 : Math.min(1, env * 1.15));
