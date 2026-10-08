@@ -63,6 +63,19 @@ closest to those recordings in timbre and pitch (`tools/samvoice.py`, `tools/bui
 **not** a clone of Sam's voice, and the page says so. If sound is off or fails, the same lines run as
 timed captions with matching mouth movement.
 
+### Re-voicing the narration in Sam's own voice
+
+`tools/clone_voice.py` regenerates every narration line by zero-shot cloning from
+`tools/sam_ref.wav` (11.5 s of Sam's approved recordings) with Chatterbox, scoring each take for
+speaker similarity against Sam's real voice and keeping the best. It needs Hugging Face access
+(`huggingface.co`, `cdn-lfs.huggingface.co`, `cas-bridge.xethub.hf.co`, `transfer.xethub.hf.co`)
+to download the model weights, and a Python 3.11 environment:
+
+```bash
+python3.11 -m venv .venv && .venv/bin/pip install chatterbox-tts resemblyzer "setuptools<81"
+.venv/bin/python tools/clone_voice.py --ref tools/sam_ref.wav --takes 3
+```
+
 ## Run and test
 
 ```bash
